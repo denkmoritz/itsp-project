@@ -112,5 +112,3 @@ python3 main.py
   - Ensure the virtual environment is activated before running `pip3 install`.
 
 ---
-
-Happy coding! 🎉
