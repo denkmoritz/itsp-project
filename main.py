@@ -1,4 +1,3 @@
-# Standard library imports
 import sys
 import os
 import threading
@@ -6,11 +5,9 @@ import http.server
 import socketserver
 import logging
 
-# Third-party library imports
 import folium
 import cv2
 
-# PyQt6 imports
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QHBoxLayout,
     QLabel, QComboBox, QTextEdit, QWidget, QPushButton,
@@ -18,14 +15,13 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
-# Project-specific imports
 from data.getRef import get_ref_list
 from road.getAzimuth import get_segment_data
 from config.configSV import ConfigSV
 from streetview.getStreetView import get_streetview_image
 from image.colorDetection import detect_color
 
-# ConfigSV instance
+# ConfigSV instance for credentials
 configSV = ConfigSV()
 
 # Set up logging
@@ -42,7 +38,7 @@ class MainUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Road Analysis Tool")
-        self.setGeometry(100, 100, 1200, 800)
+        self.setGeometry(100, 100, 1200, 800)   # Set window position with size
 
         self.state_to_roads = get_ref_list()
 
@@ -66,7 +62,7 @@ class MainUI(QMainWindow):
         self.state_selector = QComboBox()
         self.state_selector.addItems(self.state_to_roads.keys())
         self.state_selector.currentIndexChanged.connect(self.update_road_selector)
-        state_layout.addWidget(QLabel("Select a State (ISO_1):"))
+        state_layout.addWidget(QLabel("Select a State:"))
         state_layout.addWidget(self.state_selector)
         control_layout.addLayout(state_layout)
 
@@ -74,7 +70,7 @@ class MainUI(QMainWindow):
         road_layout = QHBoxLayout()
         self.road_selector = QComboBox()
         self.update_road_selector()
-        road_layout.addWidget(QLabel("Select a Road (Ref):"))
+        road_layout.addWidget(QLabel("Select a Road:"))
         road_layout.addWidget(self.road_selector)
         control_layout.addLayout(road_layout)
 
@@ -120,7 +116,7 @@ class MainUI(QMainWindow):
         <html>
             <body style="background-color: #1e1e1e; color: white; text-align: center; font-family: Arial;">
                 <h2>Welcome to the Road Analysis Tool</h2>
-                <p>Select a state and road ref, then click 'Analyze' to view the map.</p>
+                <p>Select a state and a road, then click 'Analyze' to display the output on a map.</p>
             </body>
         </html>
         """
@@ -132,11 +128,12 @@ class MainUI(QMainWindow):
         if selected_state and selected_ref:
             self.generate_map(selected_state, selected_ref)
 
+    # Function that assures that both sides of the car ('front and rear') are tested if first images has no result (color unknown)
     def process_segment(self, heading, lat, lon, index, selected_ref, selected_state):
         predominant = "unknown"
         plot_path = None
 
-        # Define the folder to save the image and plot
+        # Folder to save images and plots
         image_folder = os.path.join("data/images", f"{selected_ref}_{selected_state}")
         if not os.path.exists(image_folder):
             os.makedirs(image_folder)
@@ -166,20 +163,21 @@ class MainUI(QMainWindow):
                 image, box_width=200, box_height=200, vertical_offset=-30, plot_path=plot_path
             )
 
-            log_message(f"Plot saved at: {plot_path}")  # Debug log
+            log_message(f"Plot saved at: {plot_path}")
 
             if predominant != "unknown":
                 break
 
         return predominant, plot_path
 
+    # Function to start server and store the plots because otherwise the html file of map becomes too big
     def start_http_server(self, folder_path, port=8055):
         class CustomHandler(http.server.SimpleHTTPRequestHandler):
             def translate_path(self, path):
                 # Force the server to serve files relative to `folder_path`
-                relative_path = path.lstrip("/")  # Remove leading `/`
+                relative_path = path.lstrip("/")
                 full_path = os.path.join(folder_path, relative_path)
-                print(f"Looking for file: {full_path}")  # Debug log
+                print(f"Looking for file: {full_path}")
                 return full_path
 
         # Start the server
@@ -197,6 +195,7 @@ class MainUI(QMainWindow):
             self.http_server.server_close()
         super().closeEvent(event)
 
+    # Function that generates the map
     def generate_map(self, selected_state, selected_ref):
         try:
             # Prepare the image folder for storing plots
@@ -227,7 +226,7 @@ class MainUI(QMainWindow):
             # Start the HTTP server AFTER plots are created
             self.http_server = self.start_http_server("data/images", port=8055)
 
-            # Calculate the center of the map using min/max lat/lon
+            # Calculate center of the map using min/max lat/lon
             min_lat = min(result[0] for result in results)
             max_lat = max(result[0] for result in results)
             min_lon = min(result[1] for result in results)
@@ -239,6 +238,7 @@ class MainUI(QMainWindow):
             # Generate map with calculated center
             map_obj = folium.Map(location=[center_lat, center_lon])
 
+            # Create markers on the map with information such as the plots
             for i, (lat, lon, color, plot_path) in enumerate(results):
                 if plot_path and os.path.exists(plot_path):
                     # Compute the relative path

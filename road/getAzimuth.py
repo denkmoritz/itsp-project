@@ -2,24 +2,26 @@ import numpy as np
 from geopy.distance import geodesic
 from road.getRoad import get_road_from_db
 
+# Function to calculate segments
 def calculate_segment_azimuth_and_midpoint(geometry, step=5):
     try:
         segment_data = []
 
         if geometry.geom_type == "LineString":
             coords = list(geometry.coords)
-            segment_data.extend(_process_linestring(coords, step))
+            segment_data.extend(process_linestring(coords, step))
         elif geometry.geom_type == "MultiLineString":
             for linestring in geometry.geoms:
                 coords = list(linestring.coords)
-                segment_data.extend(_process_linestring(coords, step))
+                segment_data.extend(process_linestring(coords, step))
 
         return segment_data
     except Exception as e:
         print(f"Error calculating azimuth and midpoint: {e}")
         return []
 
-def _process_linestring(coords, step):
+# Function to process segments and calculate azimuth and midpoints
+def process_linestring(coords, step):
     segment_data = []
     for i in range(0, len(coords) - 1, step):
         x1, y1 = coords[i]  # Longitude, Latitude
@@ -35,6 +37,7 @@ def _process_linestring(coords, step):
         segment_data.append((azimuth_degrees, midpoint))
     return segment_data
 
+# Function to assure that midpoints keep a certain distance from each other
 def filter_by_distance(segment_data, min_distance_km=2):
     filtered_data = []
 
@@ -48,6 +51,7 @@ def filter_by_distance(segment_data, min_distance_km=2):
 
     return filtered_data
 
+# Main function of this file, returns the processed data to main.py
 def get_segment_data(ref=None, iso_1=None, step=5, min_distance_km=2):
     try:
         edges = get_road_from_db(ref, iso_1)
@@ -58,7 +62,7 @@ def get_segment_data(ref=None, iso_1=None, step=5, min_distance_km=2):
         # Drop invalid geometries
         edges = edges.dropna(subset=['geometry'])
 
-        # Extract all segment data into a flat list
+        # Extract all segment data into flat list
         all_segment_data = []
         for geom in edges['geometry']:
             segment_data = calculate_segment_azimuth_and_midpoint(geom, step=step)

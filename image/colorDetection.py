@@ -2,32 +2,33 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Function to detect the color of the google car
 def detect_color(image, box_width, box_height, vertical_offset=0, plot_path = None):
     # Get image dimensions
     height, width, _ = image.shape
 
-    # Calculate the center of the image
+    # Calculate center of image
     center_x, center_y = width // 2, height // 2
 
-    # Apply vertical offset to move the box up or down
+    # Vertical offset to move box up or down
     center_y += vertical_offset
 
     # Calculate half box dimensions
     half_width, half_height = box_width // 2, box_height // 2
 
-    # Define the top-left and bottom-right points of the box
+    # Define top-left and bottom-right points of box
     top_left = (center_x - half_width, center_y - half_height)
     bottom_right = (center_x + half_width, center_y + half_height)
 
-    # Crop the region inside the box
+    # Crop region inside box
     cropped_region = image[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
 
-    # Handle empty cropped region if sth went wrong
+    # Handle empty cropped region if something went wrong
     if cropped_region.size == 0:
         print("Cropped region is empty. Check box dimensions or image size.")
         return
 
-    # Convert the cropped region to HSV color space
+    # Convert cropped region to HSV color space
     hsv_cropped = cv2.cvtColor(cropped_region, cv2.COLOR_BGR2HSV)
 
     # Default blue color in BGR
@@ -37,7 +38,7 @@ def detect_color(image, box_width, box_height, vertical_offset=0, plot_path = No
     lower_blue, upper_blue = get_limits(color=blue, range_width=30, sat_low=40, val_low=40)
     print(f"HSV lower limit: {lower_blue}, HSV upper limit: {upper_blue}")
 
-    # Create a mask for blue
+    # Create mask for blue
     blue_mask = cv2.inRange(hsv_cropped, lower_blue, upper_blue)
 
     # Calculate proportions of blue pixels
@@ -53,7 +54,7 @@ def detect_color(image, box_width, box_height, vertical_offset=0, plot_path = No
         predominant_color = "unknown"
         print("The predominant color is unknown.")
 
-    # Visualize the cropped region and the masks
+    # Visualize cropped region and mask
     if plot_path:
         plt.figure(figsize=(8, 4))
         plt.subplot(1, 2, 1)
@@ -71,12 +72,13 @@ def detect_color(image, box_width, box_height, vertical_offset=0, plot_path = No
 
     return predominant_color, plot_path
 
+# Function to calculate limits for colors (range)
 def get_limits(color=None, range_width=30, sat_low=40, val_low=40):
     if color is not None:
         # Convert BGR to HSV
         c = np.uint8([[color]])
         hsvC = cv2.cvtColor(c, cv2.COLOR_BGR2HSV)
-        hue = hsvC[0][0][0]  # Get the hue value
+        hue = hsvC[0][0][0]  # Get hue value
     else:
         hue = 120  # Default to typical blue hue
 

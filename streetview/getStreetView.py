@@ -1,11 +1,12 @@
 import os
 import requests
 
+# Function to get Street View images
 def get_streetview_image(api_key, fov, pitch, size, heading, location, data_folder):
     base_url = "https://maps.googleapis.com/maps/api/streetview"
 
     params = {
-        "key": api_key,  # Updated key parameter
+        "key": api_key,
         "fov": fov,
         "heading": heading,
         "location": f"{location[0]},{location[1]}",

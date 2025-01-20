@@ -1,6 +1,6 @@
 # ITSP Project
 
-This project is designed to work with a Docker-based PostgreSQL database and a Python application. Follow the steps below to set up the environment and run the project.
+This project is designed to detect the color of Google Street View cars by using the Google Static Street View API.
 
 ---
 
@@ -15,37 +15,35 @@ Before you begin, ensure you have the following installed on your system:
 ## **Setup Instructions**
 
 ### **Step 1: Download and Load the Docker Database**
-1. Download the Docker image tar file:
-   [Download Here](https://drive.google.com/file/d/1d2-lh50M3GrngsGER_N4RGX8ovc2fELv/view?usp=sharing)
+1. Pull the Docker image:
+   ```bash
+   docker pull moritzdenk/itsp-image:latest
+   ```
    
-2. Load the Docker image:
+2. Run the Docker container
    ```bash
-   docker load < shared_postgis.tar
+   docker run -d \
+    -e POSTGRES_USER=postgres \
+    -e POSTGRES_PASSWORD=3004 \
+    -e POSTGRES_DB=itsp \
+    -p 24321:5432 \
+    --name itsp-container \
+    moritzdenk/itsp-image:latest
+
    ```
 
-3. Verify the image is loaded:
+3. Start the container after reboot or shutdown
    ```bash
-   docker images
+   docker start itsp-container
    ```
-
-4. Run the container:
-   ```bash
-   docker run -d -p 4321:5432 --name itsp_database shared_postgis
-   ```
-
-5. Confirm the database is running:
-   ```bash
-   docker ps
-   ```
-
 ---
 
 ### **Step 2: Clone the Project Repository**
 Clone the GitHub repository to your local machine:
-```bash
-git clone https://github.com/denkmoritz/itsp-project.git
-cd itsp-project
-```
+    ```bash
+    git clone https://github.com/denkmoritz/itsp-project.git
+    cd itsp-project
+    ```
 
 ---
 
@@ -93,13 +91,13 @@ python3 main.py
 
 ## **Notes**
 - Ensure Docker is running before executing the application, as it relies on the PostgreSQL database.
-- The database can be accessed locally on `localhost:4321` using a database client if needed.
+- The database can be accessed locally on `localhost:24321` using a database client if needed.
 
 ---
 
 ## **Troubleshooting**
 - **Database Connection Issues**:
-  - Ensure the Docker container is running and properly mapped to port `4321`.
+  - Ensure the Docker container is running and properly mapped to port `24321`.
   - Check if your firewall or antivirus is blocking Docker.
 
 - **Python Version Issues**:

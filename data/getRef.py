@@ -2,6 +2,7 @@ import pandas as pd
 
 csv_path = 'data/keys.csv'
 
+# Function to get all road names and states
 def get_ref_list():
     try:
         df = pd.read_csv(csv_path)
