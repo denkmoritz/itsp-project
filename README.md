@@ -40,10 +40,10 @@ Before you begin, ensure you have the following installed on your system:
 
 ### **Step 2: Clone the Project Repository**
 Clone the GitHub repository to your local machine:
-    ```bash
-    git clone https://github.com/denkmoritz/itsp-project.git
-    cd itsp-project
-    ```
+```bash
+git clone https://github.com/denkmoritz/itsp-project.git
+cd itsp-project
+  ```
 
 ---
 
@@ -52,7 +52,7 @@ Clone the GitHub repository to your local machine:
 #### **Mac/Linux Users**:
 1. Create a virtual environment:
    ```bash
-   python3.11 -m venv venv
+   python3 -m venv venv
    ```
 
 2. Activate the virtual environment:
@@ -62,12 +62,12 @@ Clone the GitHub repository to your local machine:
 
 #### **Windows Users**:
 1. Create a virtual environment:
-   ```powershell
-   python3.11 -m venv venv
+   ```bash
+   python -m venv venv
    ```
 
 2. Activate the virtual environment:
-   ```powershell
+   ```bash
    .\venv\Scripts\activate
    ```
 
@@ -98,12 +98,11 @@ python3 main.py
 ## **Troubleshooting**
 - **Database Connection Issues**:
   - Ensure the Docker container is running and properly mapped to port `24321`.
-  - Check if your firewall or antivirus is blocking Docker.
 
 - **Python Version Issues**:
   - Verify that Python 3.11 is being used:
     ```bash
-    python3.11 --version
+    python --version
     ```
 
 - **Dependency Installation Errors**:
