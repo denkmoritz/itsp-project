@@ -20,9 +20,16 @@ Before you begin, ensure you have the following installed on your system:
    docker pull moritzdenk/itsp-image:latest
    ```
    
-2. Run the Docker container
-   ```bash
-   docker run -d \ -e POSTGRES_USER=postgres \ -e POSTGRES_PASSWORD=3004 \ -e POSTGRES_DB=itsp \ -p 24321:5432 \ --name itsp-container \ moritzdenk/itsp-image:latest
+   2. Run the Docker container
+      ```bash
+      docker run -d \
+      -e POSTGRES_USER=postgres \
+      -e POSTGRES_PASSWORD=3004 \
+      -e POSTGRES_DB=itsp \
+      -p 24321:5432 \
+      --name itsp-container \
+  moritzdenk/itsp-image:latest
+
    ```
 
 3. Start the container after reboot or shutdown
